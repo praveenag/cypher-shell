@@ -1,0 +1,40 @@
+CYPHER
+
+A graph query language
+
+Cypher is Neo4j's graph query language. Working with a graph is all about understanding
+patterns of data, which are central to Cypher queries.
+
+Use MATCH clauses for reading data, and CREATE or MERGE for writing data.
+
+Reference
+
+[CREATE](https://neo4j.com/docs/developer-manual/3.0/cypher/#cypher-intro) manual page
+
+Related
+
+:help MATCH
+:help WHERE
+:help RETURN
+:help CREATE
+:help MERGE
+:help DELETE
+:help DETACH DELETE
+:help SET
+:help FOREACH
+:help HELP
+:help WITH
+:help LOAD CSV
+:help UNWIND
+:help START
+:help CREATE UNIQUE
+:help CREATE INDEX ON
+:help STARTS WITH
+:help ENDS WITH
+:help CONTAINS
+
+Example
+
+Basic form of a Cypher read statement. (Not executable)
+
+    MATCH <pattern> WHERE <conditions> RETURN <expressions>

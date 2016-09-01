@@ -1,10 +1,6 @@
 package org.neo4j.shell.commands;
 
-import org.neo4j.shell.Connector;
-import org.neo4j.shell.CypherShell;
-import org.neo4j.shell.Historian;
-import org.neo4j.shell.TransactionHandler;
-import org.neo4j.shell.VariableHolder;
+import org.neo4j.shell.*;
 import org.neo4j.shell.exception.CommandException;
 import org.neo4j.shell.exception.DuplicateCommandException;
 import org.neo4j.shell.log.AnsiFormattedText;
@@ -36,6 +32,7 @@ public class CommandHelper {
         registerCommand(new Rollback(transactionHandler));
         registerCommand(new Set(variableHolder));
         registerCommand(new Params(logger, variableHolder));
+        registerCommand(new CypherHelp(logger));
     }
 
     private void registerCommand(@Nonnull final Command command) throws DuplicateCommandException {
@@ -45,7 +42,7 @@ public class CommandHelper {
 
         commands.put(command.getName(), command);
 
-        for (String alias: command.getAliases()) {
+        for (String alias : command.getAliases()) {
             if (commands.containsKey(alias)) {
                 throw new DuplicateCommandException("This command alias has already been registered: " + alias);
             }
@@ -92,7 +89,7 @@ public class CommandHelper {
             throws CommandException {
         final String[] args;
         if (argString.trim().isEmpty()) {
-            args = new String[] {};
+            args = new String[]{};
         } else {
             args = argString.trim().split("\\s+");
         }

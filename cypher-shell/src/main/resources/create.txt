@@ -1,0 +1,28 @@
+CREATE
+
+Insert graph data
+
+The CREATE clause is used to create data by specifying named
+nodes and relationships with inline properties.
+
+Use MATCH clauses for reading data, and CREATE or MERGE for writing data.
+
+Reference
+
+[CREATE](https://neo4j.com/docs/developer-manual/3.0/cypher/#query-create) manual page
+
+Related
+
+:help SET
+:help CREATE UNIQUE
+:help MERGE
+:help Cypher
+
+Example
+
+Create two related people, returning them.
+
+    CREATE (le:Person {name:"Euler"}),
+      (db:Person {name:"Bernoulli"}),
+      (le)-[:KNOWS {since:1768}]->(db)
+    RETURN le, db

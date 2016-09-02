@@ -18,40 +18,27 @@ import static java.lang.String.format;
 public class EnhancedHelp {
 
     private final Logger logger;
-    private final List<String> keywords;
 
     public EnhancedHelp(Logger logger) {
         this.logger = logger;
-        this.keywords = new ArrayList<>();
-        initKeyWords();
     }
 
     public String getAllKeyWordsUsage() {
         return getHelp("CYPHER").formattedString();
     }
 
-    public void printGeneralHelp() throws CommandException {
-        logger.printOut(getHelp("CYPHER").formattedString());
-    }
-
     public void printHelpFor(@Nonnull final String name) throws CommandException {
-        Optional<String> matchedCypherCommand = keywords.stream()
-                .filter(kw -> kw.equalsIgnoreCase(name)).findFirst();
-
-        if (!matchedCypherCommand.isPresent()) {
+        if (!isCypherKeyword(name)) {
             throw new CommandException(AnsiFormattedText.from("No such cypher command: ").bold().append(name));
         }
 
-        String cmd = matchedCypherCommand.get();
-        logger.printOut(getHelp(cmd).formattedString());
+        logger.printOut(getHelp(name.toUpperCase()).formattedString());
     }
 
-    private AnsiFormattedText getHelp(String cmd) {
-        String fileName = format("%s.txt", cmd.toLowerCase());
-        InputStream resourceAsStream = EnhancedHelp.class.getClassLoader().getResourceAsStream(fileName);
-        BufferedReader in = new BufferedReader(new InputStreamReader(resourceAsStream));
+    private AnsiFormattedText getHelp(String cypherKeyword) {
+        BufferedReader in = new BufferedReader(new InputStreamReader(fileAsStream(cypherKeyword)));
 
-        AnsiFormattedText ansiFormattedText = AnsiFormattedText.from("").bold().append(cmd).boldOff()
+        AnsiFormattedText ansiFormattedText = AnsiFormattedText.from("").bold().append(cypherKeyword).boldOff()
                 .append("\n\n");
         String line;
         try {
@@ -65,8 +52,12 @@ public class EnhancedHelp {
         return ansiFormattedText.append("\n");
     }
 
-    private void initKeyWords() {
-        this.keywords.add("CYPHER");
-        this.keywords.add("CREATE");
+    private InputStream fileAsStream(String cmd) {
+        String fileName = format("%s.txt", cmd.toLowerCase());
+        return EnhancedHelp.class.getClassLoader().getResourceAsStream(fileName);
+    }
+
+    public boolean isCypherKeyword(String name) {
+        return fileAsStream(name) != null;
     }
 }

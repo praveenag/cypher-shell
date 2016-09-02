@@ -13,7 +13,7 @@ import static java.lang.String.format;
 import static org.neo4j.shell.commands.CommandHelper.simpleArgParse;
 
 public class CypherHelp implements Command {
-    public static final String COMMAND_NAME = ":cypher-help";
+    public static final String COMMAND_NAME = "cypher";
     private final EnhancedHelp enhancedHelp;
 
     public CypherHelp(@Nonnull Logger logger) {
@@ -54,9 +54,13 @@ public class CypherHelp implements Command {
     public void execute(@Nonnull String argString) throws ExitException, CommandException {
         String[] args = simpleArgParse(argString, 0, 1, COMMAND_NAME, getUsage());
         if (args.length == 0) {
-            enhancedHelp.printGeneralHelp();
+            enhancedHelp.printHelpFor(COMMAND_NAME);
         } else {
             enhancedHelp.printHelpFor(args[0]);
         }
+    }
+
+    public boolean isCypherKeyword(String name) {
+        return enhancedHelp.isCypherKeyword(name);
     }
 }

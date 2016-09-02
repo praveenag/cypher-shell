@@ -1,8 +1,8 @@
 package org.neo4j.shell.commands;
 
 import org.neo4j.shell.exception.CommandException;
-import org.neo4j.shell.log.Logger;
 import org.neo4j.shell.log.AnsiFormattedText;
+import org.neo4j.shell.log.Logger;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
@@ -17,10 +17,12 @@ public class Help implements Command {
     public static final String COMMAND_NAME = ":help";
     private final Logger logger;
     private final CommandHelper commandHelper;
+    private final CypherHelp cypherHelp;
 
-    public Help(@Nonnull final Logger shell, @Nonnull final CommandHelper commandHelper) {
+    public Help(@Nonnull final Logger shell, @Nonnull final CommandHelper commandHelper, CypherHelp cypherHelp) {
         this.logger = shell;
         this.commandHelper = commandHelper;
+        this.cypherHelp = cypherHelp;
     }
 
     @Nonnull
@@ -70,19 +72,21 @@ public class Help implements Command {
             cmd = commandHelper.getCommand(":" + name);
         }
 
-        if (cmd == null) {
+        if (cmd != null) {
+            logger.printOut(AnsiFormattedText.from("\nusage: ")
+                    .bold().append(cmd.getName())
+                    .boldOff()
+                    .append(" ")
+                    .append(cmd.getUsage())
+                    .append("\n\n")
+                    .append(cmd.getHelp())
+                    .append("\n")
+                    .formattedString());
+        } else if (cypherHelp.isCypherKeyword(name)) {
+            cypherHelp.execute(name);
+        } else {
             throw new CommandException(AnsiFormattedText.from("No such command: ").bold().append(name));
         }
-
-        logger.printOut(AnsiFormattedText.from("\nusage: ")
-                                         .bold().append(cmd.getName())
-                                         .boldOff()
-                                         .append(" ")
-                                         .append(cmd.getUsage())
-                                         .append("\n\n")
-                                         .append(cmd.getHelp())
-                                         .append("\n")
-                                         .formattedString());
     }
 
     private void printGeneralHelp() {
@@ -91,25 +95,27 @@ public class Help implements Command {
         // Get longest command so we can align them nicely
         List<Command> allCommands = commandHelper.getAllCommands();
 
+        allCommands.add(cypherHelp);
+
         int leftColWidth = longestCmdLength(allCommands);
 
         allCommands.stream().forEach(cmd -> logger.printOut(
                 AnsiFormattedText.from("  ")
-                                 .bold().append(String.format("%-" + leftColWidth + "s", cmd.getName()))
-                                 .boldOff().append(" " + cmd.getDescription())
-                                 .formattedString()));
+                        .bold().append(String.format("%-" + leftColWidth + "s", cmd.getName()))
+                        .boldOff().append(" " + cmd.getDescription())
+                        .formattedString()));
 
         logger.printOut("\nFor help on a specific command type:");
         logger.printOut(AnsiFormattedText.from("    ")
-                                         .append(COMMAND_NAME)
-                                         .bold().append(" command")
-                                         .boldOff().append("\n").formattedString());
+                .append(COMMAND_NAME)
+                .bold().append(" command")
+                .boldOff().append("\n").formattedString());
     }
 
     private int longestCmdLength(List<Command> allCommands) {
         String longestCommand = allCommands.stream()
-                                        .map(Command::getName)
-                                        .reduce("", (s1, s2) -> s1.length() > s2.length() ? s1 : s2);
+                .map(Command::getName)
+                .reduce("", (s1, s2) -> s1.length() > s2.length() ? s1 : s2);
         return longestCommand.length();
     }
 }

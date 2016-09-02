@@ -25,14 +25,13 @@ public class CommandHelper {
     private void registerAllCommands(Logger logger, Historian historian, Connector connector,
                                      TransactionHandler transactionHandler, VariableHolder variableHolder) {
         registerCommand(new Exit(logger));
-        registerCommand(new Help(logger, this));
+        registerCommand(new Help(logger, this, new CypherHelp(logger)));
         registerCommand(new History(logger, historian));
         registerCommand(new Begin(transactionHandler));
         registerCommand(new Commit(transactionHandler));
         registerCommand(new Rollback(transactionHandler));
         registerCommand(new Set(variableHolder));
         registerCommand(new Params(logger, variableHolder));
-        registerCommand(new CypherHelp(logger));
     }
 
     private void registerCommand(@Nonnull final Command command) throws DuplicateCommandException {

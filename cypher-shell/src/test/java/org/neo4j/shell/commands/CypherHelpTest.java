@@ -6,10 +6,12 @@ import org.junit.rules.ExpectedException;
 import org.neo4j.shell.exception.CommandException;
 import org.neo4j.shell.log.Logger;
 
+import static junit.framework.Assert.assertTrue;
 import static junit.framework.TestCase.fail;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 public class CypherHelpTest {
@@ -45,6 +47,77 @@ public class CypherHelpTest {
 
         // then
         verify(logger).printOut(getUsageText());
+    }
+
+    @Test
+    public void helpForCommand() throws CommandException {
+        // when
+        cmd.execute("CREATE");
+
+        // then
+        verify(logger).printOut(createHelpText());
+    }
+
+    @Test
+    public void helpForNonExistingCommandThrows() throws CommandException {
+        // then
+        thrown.expect(CommandException.class);
+        thrown.expectMessage("No such cypher command: notacypher");
+
+        // when
+        cmd.execute("notacypher");
+    }
+
+    @Test
+    public void helpIsCaseInsensitive() throws CommandException {
+        // when
+        cmd.execute("create");
+
+        // then
+        verify(logger).printOut(createHelpText());
+    }
+
+    @Test
+    public void isCypherKeyword() throws CommandException {
+        // when
+        assertTrue(cmd.isCypherKeyword("create"));
+        assertTrue(cmd.isCypherKeyword("CREATE"));
+        assertTrue(cmd.isCypherKeyword("CYPHER"));
+        assertFalse(cmd.isCypherKeyword("NotAValidCommand"));
+    }
+
+    private String createHelpText() {
+        return "@|BOLD CREATE|@\n" +
+                "\n" +
+                "CREATE\n" +
+                "\n" +
+                "Insert graph data\n" +
+                "\n" +
+                "The CREATE clause is used to create data by specifying named\n" +
+                "nodes and relationships with inline properties.\n" +
+                "\n" +
+                "Use MATCH clauses for reading data, and CREATE or MERGE for writing data.\n" +
+                "\n" +
+                "Reference\n" +
+                "\n" +
+                "[CREATE](https://neo4j.com/docs/developer-manual/3.0/cypher/#query-create) manual page\n" +
+                "\n" +
+                "Related\n" +
+                "\n" +
+                ":help SET\n" +
+                ":help CREATE UNIQUE\n" +
+                ":help MERGE\n" +
+                ":help Cypher\n" +
+                "\n" +
+                "Example\n" +
+                "\n" +
+                "Create two related people, returning them.\n" +
+                "\n" +
+                "    CREATE (le:Person {name:\"Euler\"}),\n" +
+                "      (db:Person {name:\"Bernoulli\"}),\n" +
+                "      (le)-[:KNOWS {since:1768}]->(db)\n" +
+                "    RETURN le, db\n" +
+                "\n";
     }
 
     private String getUsageText() {
@@ -90,71 +163,6 @@ public class CypherHelpTest {
                 "Basic form of a Cypher read statement. (Not executable)\n" +
                 "\n" +
                 "    MATCH <pattern> WHERE <conditions> RETURN <expressions>\n" +
-                "\n";
-    }
-
-    @Test
-    public void helpForCommand() throws CommandException {
-        // when
-        cmd.execute("CREATE");
-
-        // then
-        verify(logger).printOut(createHelpText());
-    }
-
-    @Test
-    public void helpForNonExistingCommandThrows() throws CommandException {
-        // then
-        thrown.expect(CommandException.class);
-        thrown.expectMessage("No such cypher command: notacypher");
-
-        // when
-        cmd.execute("notacypher");
-    }
-
-    @Test
-    public void helpIsCaseInsensitive() throws CommandException {
-        // given
-//        doReturn(new FakeCommand(":bob")).when(cmdHelper).getCommand(eq(":bob"));
-
-        // when
-        cmd.execute("create");
-
-        // then
-        verify(logger).printOut(createHelpText());
-    }
-
-    private String createHelpText() {
-        return "@|BOLD CREATE|@\n" +
-                "\n" +
-                "CREATE\n" +
-                "\n" +
-                "Insert graph data\n" +
-                "\n" +
-                "The CREATE clause is used to create data by specifying named\n" +
-                "nodes and relationships with inline properties.\n" +
-                "\n" +
-                "Use MATCH clauses for reading data, and CREATE or MERGE for writing data.\n" +
-                "\n" +
-                "Reference\n" +
-                "\n" +
-                "[CREATE](https://neo4j.com/docs/developer-manual/3.0/cypher/#query-create) manual page\n" +
-                "\n" +
-                "Related\n" +
-                "\n" +
-                ":help SET\n" +
-                ":help CREATE UNIQUE\n" +
-                ":help MERGE\n" +
-                ":help Cypher\n" +
-                "\n" +
-                "Example\n" +
-                "\n" +
-                "Create two related people, returning them.\n" +
-                "\n" +
-                "    CREATE (le:Person {name:\"Euler\"}),\n" +
-                "      (db:Person {name:\"Bernoulli\"}),\n" +
-                "      (le)-[:KNOWS {since:1768}]->(db)\n" +
-                "    RETURN le, db\n" +
                 "\n";
     }
 }

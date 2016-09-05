@@ -25,7 +25,7 @@ public class CommandHelper {
     private void registerAllCommands(Logger logger, Historian historian, Connector connector,
                                      TransactionHandler transactionHandler, VariableHolder variableHolder) {
         registerCommand(new Exit(logger));
-        registerCommand(new Help(logger, this, new CypherHelp(logger)));
+        registerCommand(new Help(logger, this, new EnhancedHelp(logger)));
         registerCommand(new History(logger, historian));
         registerCommand(new Begin(transactionHandler));
         registerCommand(new Commit(transactionHandler));

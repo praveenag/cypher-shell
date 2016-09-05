@@ -28,11 +28,11 @@ public class HelpTest {
     private CommandHelper cmdHelper = mock(CommandHelper.class);
 
     private Command cmd;
-    private CypherHelp cypherHelp = new CypherHelp(logger);
+    private EnhancedHelp enhancedHelp = new EnhancedHelp(logger);
 
     @Before
     public void setup() {
-        this.cmd = new Help(logger, cmdHelper, cypherHelp);
+        this.cmd = new Help(logger, cmdHelper, enhancedHelp);
     }
 
     @Test
@@ -65,11 +65,12 @@ public class HelpTest {
 
         // then
         verify(logger).printOut("\nAvailable commands:");
-        verify(logger).printOut("  @|BOLD bob   |@ description for bob");
-        verify(logger).printOut("  @|BOLD bobby |@ description for bobby");
-        verify(logger).printOut("  @|BOLD cypher|@ Show help text for different cypher keywords");
+        verify(logger).printOut("  @|BOLD bob  |@ description for bob");
+        verify(logger).printOut("  @|BOLD bobby|@ description for bobby");
         verify(logger).printOut("\nFor help on a specific command type:");
         verify(logger).printOut("    :help@|BOLD  command|@\n");
+        verify(logger).printOut("\nFor help on cypher type:");
+        verify(logger).printOut("    :help@|BOLD  CYPHER|@\n");
     }
 
     @Test

@@ -17,12 +17,14 @@ public class Help implements Command {
     public static final String COMMAND_NAME = ":help";
     private final Logger logger;
     private final CommandHelper commandHelper;
-    private final CypherHelp cypherHelp;
+    private final EnhancedHelp enhancedHelp;
 
-    public Help(@Nonnull final Logger shell, @Nonnull final CommandHelper commandHelper, CypherHelp cypherHelp) {
+    public Help(@Nonnull final Logger shell,
+                @Nonnull final CommandHelper commandHelper,
+                @Nonnull EnhancedHelp enhancedHelp) {
         this.logger = shell;
         this.commandHelper = commandHelper;
-        this.cypherHelp = cypherHelp;
+        this.enhancedHelp = enhancedHelp;
     }
 
     @Nonnull
@@ -82,8 +84,8 @@ public class Help implements Command {
                     .append(cmd.getHelp())
                     .append("\n")
                     .formattedString());
-        } else if (cypherHelp.isCypherKeyword(name)) {
-            cypherHelp.execute(name);
+        } else if (enhancedHelp.isCypherKeyword(name)) {
+            enhancedHelp.printCypherHelp(name);
         } else {
             throw new CommandException(AnsiFormattedText.from("No such command: ").bold().append(name));
         }
@@ -94,8 +96,6 @@ public class Help implements Command {
 
         // Get longest command so we can align them nicely
         List<Command> allCommands = commandHelper.getAllCommands();
-
-        allCommands.add(cypherHelp);
 
         int leftColWidth = longestCmdLength(allCommands);
 
@@ -109,6 +109,12 @@ public class Help implements Command {
         logger.printOut(AnsiFormattedText.from("    ")
                 .append(COMMAND_NAME)
                 .bold().append(" command")
+                .boldOff().append("\n").formattedString());
+
+        logger.printOut("\nFor help on cypher type:");
+        logger.printOut(AnsiFormattedText.from("    ")
+                .append(COMMAND_NAME)
+                .bold().append(" " + EnhancedHelp.CYPHER_COMMAND_NAME).boldOff()
                 .boldOff().append("\n").formattedString());
     }
 

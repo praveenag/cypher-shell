@@ -5,7 +5,9 @@ import org.neo4j.shell.exception.CommandException;
 import org.neo4j.shell.log.Logger;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -15,20 +17,33 @@ public class EnhancedHelpTest {
     private final EnhancedHelp enhancedHelp = new EnhancedHelp(logger);
 
     @Test
-    public void constructedShouldInitialiseResourcesBasedOnKeyWords() throws Exception {
-        assertThat(enhancedHelp.getAllKeyWordsUsage(), is(getUsageText()));
+    public void isCypherKeyword() throws CommandException {
+        assertTrue(enhancedHelp.isCypherKeyword("create"));
+        assertTrue(enhancedHelp.isCypherKeyword("CREATE"));
+        assertTrue(enhancedHelp.isCypherKeyword("cypher"));
+
+        assertFalse(enhancedHelp.isCypherKeyword("random"));
     }
 
     @Test
     public void helpForCommand() throws CommandException {
         // when
-        enhancedHelp.printHelpFor("create");
+        enhancedHelp.printCypherHelp("create");
 
         // then
         verify(logger).printOut(createHelpText());
     }
 
-    private String getUsageText() {
+    @Test
+    public void helpListing() throws CommandException {
+        // when
+        enhancedHelp.printCypherHelp("");
+
+        // then
+        verify(logger).printOut(usageHelpText());
+    }
+
+    private String usageHelpText() {
         return "@|BOLD CYPHER|@\n" +
                 "\n" +
                 "CYPHER\n" +

@@ -9,30 +9,33 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 import static java.lang.String.format;
 
 public class EnhancedHelp {
 
+    public static final String CYPHER_COMMAND_NAME = "CYPHER";
     private final Logger logger;
 
     public EnhancedHelp(Logger logger) {
         this.logger = logger;
     }
 
-    public String getAllKeyWordsUsage() {
-        return getHelp("CYPHER").formattedString();
+    public void printCypherHelp(@Nonnull String cypherKeyword) throws CommandException {
+        if (cypherKeyword.isEmpty()) {
+            logger.printOut(getHelp(CYPHER_COMMAND_NAME).formattedString());
+        } else {
+            final String name = cypherKeyword.trim();
+            if (!isCypherKeyword(name)) {
+                throw new CommandException(AnsiFormattedText.from("No such cypher command: ").bold().append(name));
+            }
+
+            logger.printOut(getHelp(name.toUpperCase()).formattedString());
+        }
     }
 
-    public void printHelpFor(@Nonnull final String name) throws CommandException {
-        if (!isCypherKeyword(name)) {
-            throw new CommandException(AnsiFormattedText.from("No such cypher command: ").bold().append(name));
-        }
-
-        logger.printOut(getHelp(name.toUpperCase()).formattedString());
+    public boolean isCypherKeyword(String name) {
+        return fileAsStream(name) != null;
     }
 
     private AnsiFormattedText getHelp(String cypherKeyword) {
@@ -55,9 +58,5 @@ public class EnhancedHelp {
     private InputStream fileAsStream(String cmd) {
         String fileName = format("%s.txt", cmd.toLowerCase());
         return EnhancedHelp.class.getClassLoader().getResourceAsStream(fileName);
-    }
-
-    public boolean isCypherKeyword(String name) {
-        return fileAsStream(name) != null;
     }
 }

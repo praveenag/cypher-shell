@@ -1,7 +1,10 @@
 package org.neo4j.shell.commands;
 
 
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.neo4j.shell.ConnectionConfig;
@@ -19,7 +22,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.*;
 
-@Ignore
 public class CypherShellIntegrationTest {
     @Rule
     public final ExpectedException thrown = ExpectedException.none();
